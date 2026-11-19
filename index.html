@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>JEK MONEY</title>
+<style>
+:root{--bg:#0d1421;--panel:#172235;--line:#293950;--text:#f4f7fb;--muted:#9aabc0;--green:#35d39a;--red:#ff7185}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#17253a,#0b111c 65%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:760px;margin:auto;padding:20px 15px 40px}.head{display:flex;align-items:center;gap:12px;margin:6px 0 20px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#35d39a,#168aab);display:grid;place-items:center;color:#061a18;font-weight:900;font-size:22px}.head h1{font-size:21px;margin:0}.sub{font-size:12px;color:var(--muted)}
+.month{margin-left:auto;background:#1d2b40;border:1px solid var(--line);border-radius:10px;color:white;padding:8px;font:inherit;font-size:12px;max-width:150px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:#172235;border:1px solid var(--line);border-radius:16px;padding:14px}.card.total{grid-column:1/-1;background:linear-gradient(120deg,#174b47,#1b3044)}.label{font-size:12px;color:var(--muted)}.amount{font-size:21px;font-weight:800;margin-top:7px;overflow-wrap:anywhere}.income{color:var(--green)}.expense{color:var(--red)}.total .amount{font-size:27px}
+h2{font-size:16px;margin:22px 0 10px}.panel{background:#172235;border:1px solid var(--line);border-radius:16px;padding:15px}
+.toggle{display:flex;background:#101a29;border-radius:11px;padding:4px;gap:4px}.toggle button{flex:1;border:0;border-radius:8px;background:transparent;color:var(--muted);padding:10px;font-weight:700}.toggle button.active[data-type="income"]{background:#15533f;color:#8bf0c7}.toggle button.active[data-type="expense"]{background:#5b2938;color:#ffb1bd}
+label{display:block;font-size:12px;color:#c4d0df;margin:12px 0 6px}input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #354760;background:#0f1928;color:#fff;font:inherit;min-width:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.manage{border:1px solid #49617d;background:#203149;color:#eaf1ff;border-radius:9px;padding:9px 11px;margin-top:9px;font-size:12px;cursor:pointer}
+button.save{width:100%;border:0;border-radius:11px;background:linear-gradient(90deg,#27b987,#2799b8);color:#041b18;padding:13px;margin-top:15px;font-weight:850;font-size:15px}
+.list{display:flex;flex-direction:column;gap:8px}.item{display:flex;align-items:center;gap:10px;padding:12px;background:#101a29;border:1px solid #293950;border-radius:12px}.dot{width:9px;height:9px;border-radius:50%;flex:none}.details{flex:1;min-width:0}.details strong{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.details small{color:var(--muted);font-size:11px}.value{font-weight:800;font-size:13px;white-space:nowrap}.del{border:0;background:transparent;color:#a9b7c8;font-size:18px;padding:4px 7px;cursor:pointer}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 8px}.hint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:12px}.footer{text-align:center;color:#71839a;font-size:11px;margin-top:20px}
+@media(max-width:420px){.amount{font-size:18px}.total .amount{font-size:24px}.row{grid-template-columns:1fr}.month{max-width:130px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head"><div class="logo">J</div><div><h1>JEK MONEY</h1><div class="sub">Catatan pemasukan & pengeluaran</div></div><input class="month" id="month" type="month" aria-label="Pilih bulan laporan"></header>
+<section class="cards">
+ <div class="card total"><div class="label">SALDO BERSIH BULAN INI</div><div class="amount" id="balance">Rp0</div></div>
+ <div class="card"><div class="label">TOTAL PEMASUKAN</div><div class="amount income" id="incomeTotal">Rp0</div></div>
+ <div class="card"><div class="label">TOTAL PENGELUARAN</div><div class="amount expense" id="expenseTotal">Rp0</div></div>
+</section>
+<h2>Tambah transaksi</h2>
+<section class="panel">
+ <div class="toggle">
+  <button class="active" data-type="income" type="button">＋ Pemasukan</button>
+  <button data-type="expense" type="button">− Pengeluaran</button>
+ </div>
+ <form id="form">
+  <label for="desc">Keterangan transaksi</label><input id="desc" placeholder="Contoh: Panen sawit, belanja dapur" maxlength="70" required>
+  <div class="row">
+   <div><label for="amount">Jumlah (Rp)</label><input id="amount" type="number" min="1" step="1" placeholder="50000" required></div>
+   <div><label for="category">Jenis transaksi</label><select id="category"></select><button class="manage" type="button" id="addCategory">＋ Tambah jenis sendiri</button></div>
+  </div>
+  <label for="date">Tanggal transaksi</label><input id="date" type="date" required>
+  <button class="save" type="submit">Simpan transaksi</button>
+ </form>
+ <div class="hint">Tanggal otomatis terisi hari ini. Bisa diubah jika mencatat transaksi hari sebelumnya. Nama jenis pemasukan/pengeluaran bisa abang tambah sendiri.</div>
+</section>
+<h2>Riwayat transaksi</h2>
+<section class="panel"><div class="list" id="history"><div class="empty">Belum ada transaksi pada bulan ini.</div></div></section>
+<div class="footer">JEK MONEY • Catatan keuangan pribadi</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const now=new Date();
+const localDate=d=>{const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)};
+$("date").value=localDate(now);$("month").value=localDate(now).slice(0,7);
+let type="income", entries=[], custom={income:[],expense:[]};
+try{entries=JSON.parse(localStorage.getItem("jekMoneyEntriesV2")||"[]");if(!Array.isArray(entries))entries=[]}catch(e){entries=[]}
+try{custom=JSON.parse(localStorage.getItem("jekMoneyCategoriesV2")||'{"income":[],"expense":[]}')}catch(e){custom={income:[],expense:[]}}
+const defaults={income:["Gaji","Hasil panen","Penjualan","Usaha","Bonus","Lain-lain"],expense:["Makanan","Belanja rumah","Transportasi","Pulsa & internet","Modal usaha","Tagihan","Kesehatan","Lain-lain"]};
+function cats(t){return [...new Set([...defaults[t],...(custom[t]||[])])]}
+function setType(t){type=t;document.querySelectorAll(".toggle button").forEach(b=>b.classList.toggle("active",b.dataset.type===t));fillCategories()}
+function fillCategories(){const list=cats(type);$("category").innerHTML=list.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+document.querySelectorAll(".toggle button").forEach(b=>b.addEventListener("click",()=>setType(b.dataset.type)));
+$("addCategory").addEventListener("click",()=>{
+ const name=prompt("Masukkan nama jenis "+(type==="income"?"pemasukan":"pengeluaran")+" baru:");
+ if(name===null)return;const clean=name.trim();
+ if(!clean){alert("Nama jenis belum diisi.");return}
+ if(cats(type).some(x=>x.toLowerCase()===clean.toLowerCase())){alert("Jenis itu sudah ada.");return}
+ custom[type].push(clean);localStorage.setItem("jekMoneyCategoriesV2",JSON.stringify(custom));fillCategories();$("category").value=clean;
+});
+function save(){localStorage.setItem("jekMoneyEntriesV2",JSON.stringify(entries))}
+function render(){
+ const month=$("month").value, shown=entries.filter(e=>e.date.slice(0,7)===month).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ const inc=shown.filter(e=>e.type==="income").reduce((s,e)=>s+e.amount,0), exp=shown.filter(e=>e.type==="expense").reduce((s,e)=>s+e.amount,0);
+ $("incomeTotal").textContent=rupiah(inc);$("expenseTotal").textContent=rupiah(exp);$("balance").textContent=rupiah(inc-exp);
+ $("history").innerHTML="";
+ if(!shown.length){$("history").innerHTML='<div class="empty">Belum ada transaksi pada bulan ini.</div>';return}
+ shown.forEach(e=>{
+  const item=document.createElement("div");item.className="item";
+  const dot=document.createElement("span");dot.className="dot";dot.style.background=e.type==="income"?"var(--green)":"var(--red)";
+  const details=document.createElement("div");details.className="details";
+  const title=document.createElement("strong");title.textContent=e.desc;
+  const d=new Date(e.date+"T00:00:00");
+  const dateText=d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const meta=document.createElement("small");meta.textContent=e.category+" • "+dateText;
+  details.append(title,meta);
+  const value=document.createElement("div");value.className="value "+(e.type==="income"?"income":"expense");value.textContent=(e.type==="income"?"+":"−")+rupiah(e.amount);
+  const del=document.createElement("button");del.className="del";del.type="button";del.textContent="×";del.title="Hapus transaksi";
+  del.addEventListener("click",()=>{if(confirm("Hapus transaksi ini?")){entries=entries.filter(x=>x.id!==e.id);save();render()}});
+  item.append(dot,details,value,del);$("history").append(item);
+ });
+}
+function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n)}
+$("form").addEventListener("submit",ev=>{
+ ev.preventDefault();const desc=$("desc").value.trim(),amount=Number($("amount").value),date=$("date").value;
+ if(!desc||!Number.isSafeInteger(amount)||amount<1||!date){alert("Periksa keterangan, jumlah, dan tanggal.");return}
+ entries.push({id:Date.now()+Math.floor(Math.random()*1000),type,desc,amount,category:$("category").value,date});
+ save();$("desc").value="";$("amount").value="";$("date").value=localDate(new Date());$("month").value=date.slice(0,7);render();
+});
+$("month").addEventListener("change",render);setType("income");render();
+</script>
+</body></html>
